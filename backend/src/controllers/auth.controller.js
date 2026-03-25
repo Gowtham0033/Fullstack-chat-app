@@ -216,14 +216,23 @@ export const updateProfile = async (req, res) => {
       return res.status(400).json({ message: "Profile pic is required" });
     }
 
-    const uploadResponse = await cloudinary.uploader.upload(profilePic);
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      { profilePic: uploadResponse.secure_url },
-      { new: true }
-    );
+    try {
+      const uploadResponse = await cloudinary.uploader.upload(profilePic, {
+        resource_type: "auto",
+        max_bytes: 5242880, // 5MB limit
+      });
+      
+      const updatedUser = await User.findByIdAndUpdate(
+        userId,
+        { profilePic: uploadResponse.secure_url },
+        { new: true }
+      );
 
-    res.status(200).json(updatedUser);
+      res.status(200).json(updatedUser);
+    } catch (uploadError) {
+      console.log("Cloudinary upload error:", uploadError);
+      return res.status(500).json({ message: "Image upload failed: " + uploadError.message });
+    }
   } catch (error) {
     console.log("error in update profile:", error);
     res.status(500).json({ message: "Internal server error" });
