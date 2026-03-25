@@ -23,7 +23,8 @@ app.use(cors({
   origin: [
     "https://pepochat.vercel.app",
     "http://localhost:5173",
-    "http://localhost:3000"
+    "http://localhost:3000",
+    process.env.RENDER_EXTERNAL_URL || "https://fullstack-chat-app-ggsf.onrender.com"
   ],
   credentials: true
 }));
